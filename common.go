@@ -33,9 +33,14 @@ func init() {
 func mapToResponseHdr(m map[string]interface{}) WBResponseHdr {
 	ri := WBResponseHdr{
 		Page: int(m["page"].(float64)),
-		PerPage: m["per_page"].(string),
 		Pages: int(m["pages"].(float64)),
-		Total: uint64(m["total"].(float64)),
+	}
+
+	if vs, ok := m["per_page"].(string); ok {
+		ri.PerPage = vs
+	}
+	if vf, ok := m["total"]; ok {
+		ri.Total =  uint64(vf.(float64))
 	}
 	return ri
 }

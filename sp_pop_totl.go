@@ -67,6 +67,7 @@ func WBGetPopulationDataById(id string, startYear, endYear string) []CountryPopu
 	// Format the URL
 	uri := getCountryPopURI(id)
 	// Append the query string
+	log.Printf("Country Population: requesting %s.\n", uri)
 	resp, err := hc.getRequest(uri + buildQuery(map[string]string{
 		"format":"json", "date": dateRange, "per_page": itemsPerPage}))
 	if err != nil {
@@ -74,10 +75,15 @@ func WBGetPopulationDataById(id string, startYear, endYear string) []CountryPopu
 	}
 
 	respMap := decodeResponseToMap(resp).([]interface{})
+	log.Printf("Received: %v\n", respMap)
 
 	// The first record contains information about the response data.
 	// Page number, number of pages, number of records per page, and total number of records.
 	ri := mapToResponseHdr(respMap[0].(map[string]interface{}))
+	if ri.Total == 0 {
+		log.Printf("No results returned for %s.", id)
+		return []CountryPopulationByYear{}
+	}
 
 	// Skip over the first record to the start of the data
 	data := respMap[1].([]interface{})
